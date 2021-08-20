@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31605.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComfyQM Standalone", "ComfyQM Standalone.csproj", "{2A5D53CB-8B0E-4FA6-B800-1204E11F0589}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2A5D53CB-8B0E-4FA6-B800-1204E11F0589}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A5D53CB-8B0E-4FA6-B800-1204E11F0589}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A5D53CB-8B0E-4FA6-B800-1204E11F0589}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A5D53CB-8B0E-4FA6-B800-1204E11F0589}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AD42A853-E716-4F4F-8920-EA9E663A4663}
+	EndGlobalSection
+EndGlobal
