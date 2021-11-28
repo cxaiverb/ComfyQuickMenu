@@ -22,9 +22,8 @@ namespace ComfyQM_Standalone
         {
             while (VRCUiManager.field_Private_Static_VRCUiManager_0 is null) yield return null;
             while (UIManager.field_Private_Static_UIManager_0 is null) yield return null;
-            while (GameObject.Find("UserInterface").GetComponentInChildren<VRC.UI.Elements.QuickMenu>(true) == null) yield return null;
+            while ((QuickMenuObject = GameObject.Find("UserInterface").GetComponentInChildren<VRC.UI.Elements.QuickMenu>(true)?.gameObject) is null) yield return null;
 
-            QuickMenuObject = GameObject.Find("UserInterface").GetComponentInChildren<VRC.UI.Elements.QuickMenu>(true).gameObject;
             LeftHand = VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.transform.Find("DotLeftHand").gameObject;
             RightHand = VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.transform.Find("DotRightHand").gameObject;
         }
