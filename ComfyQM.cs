@@ -50,7 +50,7 @@ namespace ComfyQM_Standalone
 
         public override void OnUpdate()
         {
-            if (!QuickMenuObject.active || !ComfyToggle.Value)
+            if (QuickMenuObject is null || !QuickMenuObject.active || !ComfyToggle.Value)
                 return;
 
             LeftHand?.SetActive(true);
