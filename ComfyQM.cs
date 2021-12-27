@@ -32,11 +32,12 @@ namespace ComfyQM_Standalone
 
             MelonCoroutines.Start(WaitForUIMan());
             
-            HarmonyInstance.Patch(typeof(VRC.UI.Elements.QuickMenu).GetMethod(nameof(VRC.UI.Elements.QuickMenu.Method_Private_Boolean_0)),
+            HarmonyInstance.Patch(typeof(VRC.UI.Elements.QuickMenu).GetMethod(nameof(VRC.UI.Elements.QuickMenu.Method_Private_Boolean_2)),
                 typeof(ComfyQM).GetMethod(nameof(IsAttachedToHandPatch), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
-            HarmonyInstance.Patch(typeof(VRC.UI.Elements.QuickMenu).GetMethod(nameof(VRC.UI.Elements.QuickMenu.Method_Private_Boolean_1)),
+            /*
+             HarmonyInstance.Patch(typeof(VRC.UI.Elements.QuickMenu).GetMethod(nameof(VRC.UI.Elements.QuickMenu.Method_Private_Boolean_1)),
                 typeof(ComfyQM).GetMethod(nameof(IsAttachedToHandPatch), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
-
+            */ 
         }
 
         public void OnUIManInit()
@@ -63,10 +64,10 @@ namespace ComfyQM_Standalone
                 VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.field_Private_Boolean_7 = false;
             }
         }
-
+        
         private static bool IsAttachedToHandPatch(ref bool __result)
         {
-            if (XRDevice.isPresent == false)
+            if (!XRDevice.isPresent)
             {
                 return true;
             }
