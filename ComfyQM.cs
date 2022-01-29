@@ -4,6 +4,8 @@ using MelonLoader;
 using UnityEngine;
 using UnityEngine.XR;
 using VRC.UI.Core;
+using UnhollowerBaseLib.Attributes;
+using System;
 
 namespace ComfyQM_Standalone
 {
@@ -13,6 +15,7 @@ namespace ComfyQM_Standalone
         private GameObject LeftHand;
         private GameObject QuickMenuObject;
         public static MelonPreferences_Entry<bool> ComfyToggle;
+        public static MelonPreferences_Entry<bool> RotationToggle;
         public static MelonPreferences_Category ComfyQuickMenu;
 
         public IEnumerator WaitForUIMan()
@@ -29,6 +32,7 @@ namespace ComfyQM_Standalone
         {
             ComfyQuickMenu = MelonPreferences.CreateCategory("ComfyQM");
             ComfyToggle = ComfyQuickMenu.CreateEntry("ComfyQM Toggle", false);
+            RotationToggle = ComfyQuickMenu.CreateEntry("Menu Rotation", false);
 
             MelonCoroutines.Start(WaitForUIMan());
             
@@ -44,6 +48,35 @@ namespace ComfyQM_Standalone
         {
             LeftHand = VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.transform.Find("DotLeftHand").gameObject;
             RightHand = VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.transform.Find("DotRightHand").gameObject;
+            var EDL = QuickMenuObject.AddComponent<EnableDisableListener>();
+            EDL.OnEnableEvent += QMCheck;
+        }
+
+        [RegisterTypeInIl2Cpp]
+        public class EnableDisableListener : MonoBehaviour
+        {
+            [method: HideFromIl2Cpp]
+            public event Action OnEnableEvent;
+            [method: HideFromIl2Cpp]
+            public event Action OnDisableEvent;
+            public EnableDisableListener(IntPtr obj) : base(obj) { }
+            public void OnEnable() => OnEnableEvent?.Invoke();
+            public void OnDisable() => OnDisableEvent?.Invoke();
+        }
+
+        public void QMCheck()
+        {
+            if (RotationToggle.Value == true)
+            {
+                //takes rotation of head/Camera (eye)
+                var NeckRotate = VRCPlayer.field_Internal_Static_VRCPlayer_0.gameObject.GetComponent<GamelikeInputController>().field_Protected_NeckMouseRotator_0.transform.Find("Camera (eye)").transform;
+                //gets QM rotation
+                var QMAngle = QuickMenuObject.transform.rotation.eulerAngles;
+                //reserves x and y rotations, swaps z
+                var NewAngle = new Vector3(QMAngle.x, QMAngle.y, NeckRotate.rotation.eulerAngles.z);
+                //applies the z rotation
+                QuickMenuObject.transform.rotation = Quaternion.Euler(NewAngle);
+            }
         }
 
         public override void OnUpdate()
@@ -63,6 +96,7 @@ namespace ComfyQM_Standalone
                 VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.field_Private_Boolean_2 = false;
                 VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.field_Private_Boolean_7 = false;
             }
+
         }
         
         private static bool IsAttachedToHandPatch(ref bool __result)
