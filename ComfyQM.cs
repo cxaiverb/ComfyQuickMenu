@@ -66,6 +66,10 @@ namespace ComfyQM_Standalone
 
         public void QMCheck()
         {
+            if (!XRDevice.isPresent)
+            {
+                return;
+            }
             if (RotationToggle.Value == true)
             {
                 //takes rotation of head/Camera (eye)
