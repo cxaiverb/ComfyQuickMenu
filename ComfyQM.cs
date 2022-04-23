@@ -3,9 +3,13 @@ using System.Reflection;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.XR;
+using UnityEngine.Animations;
 using VRC.UI.Core;
 using UnhollowerBaseLib.Attributes;
+using UnhollowerRuntimeLib.XrefScans;
 using System;
+using Harmony;
+using System.Linq;
 
 namespace ComfyQM_Standalone
 {
@@ -17,6 +21,8 @@ namespace ComfyQM_Standalone
         public static MelonPreferences_Entry<bool> ComfyToggle;
         public static MelonPreferences_Entry<bool> RotationToggle;
         public static MelonPreferences_Category ComfyQuickMenu;
+
+        //public static MelonPreferences_Entry<bool> uncomfyQM; //a person in vrcmg (「Spooks」#4894) asked for this, dont blame me for this
 
         public IEnumerator WaitForUIMan()
         {
@@ -34,14 +40,24 @@ namespace ComfyQM_Standalone
             ComfyToggle = ComfyQuickMenu.CreateEntry("ComfyQM Toggle", false);
             RotationToggle = ComfyQuickMenu.CreateEntry("Menu Rotation", false);
 
+            //uncomfyQM = ComfyQuickMenu.CreateEntry("uncomfies your quickmenu", false);
+
             MelonCoroutines.Start(WaitForUIMan());
-            
-            HarmonyInstance.Patch(typeof(VRC.UI.Elements.QuickMenu).GetMethod(nameof(VRC.UI.Elements.QuickMenu.Method_Private_Boolean_0)),
-                typeof(ComfyQM).GetMethod(nameof(IsAttachedToHandPatch), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
-            
-             HarmonyInstance.Patch(typeof(VRC.UI.Elements.QuickMenu).GetMethod(nameof(VRC.UI.Elements.QuickMenu.Method_Private_Boolean_1)),
-                typeof(ComfyQM).GetMethod(nameof(IsAttachedToHandPatch), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
-            
+
+            //dubya is amazing and helped with the xref, ty dubya
+
+            var methodInfo = typeof(VRC.UI.Elements.QuickMenu).GetMethods().Where(m =>
+                    m.Name.StartsWith("Method_Private_Boolean") &&
+                    //Possible future proof for 'Potentially Dead Method (as pre Requi)
+                    !m.Name.Contains("PDM") &&
+                    //The two bool methods are IsAttachedToRightHand and IsAttachedToHand
+                    //IsAttachedToHand (Method_Private_Boolean_2) has Xrefs, IsAttachedToRightHand does not
+                    //This is a rather temporary fix as a fake method of IsAttachedToHand could 'pass' this check
+                    XrefScanner.XrefScan(m).Count() > 0
+                //Single will throw an error if there are more then 1 items
+                ).Single();
+            HarmonyInstance.Patch(methodInfo, typeof(ComfyQM).GetMethod(nameof(IsAttachedToHandPatch), BindingFlags.NonPublic | BindingFlags.Static).ToNewHarmonyMethod());
+
         }
 
         public void OnUIManInit()
@@ -82,6 +98,34 @@ namespace ComfyQM_Standalone
                 QuickMenuObject.transform.rotation = Quaternion.Euler(NewAngle);
             }
         }
+        //work in progress thing
+        /*public void UnComfy()
+        {
+            var WristSource = GameObject.Find("_Application/TrackingVolume/TrackingSteam(Clone)/SteamCamera/[CameraRig]/Controller (left)/WristOrigin");
+
+            if (WristSource == null)
+            {
+                return;
+            }
+
+            var parentConstraint = QuickMenuObject.GetComponent<ParentConstraint>();
+            if (parentConstraint == null)
+            {
+                parentConstraint = QuickMenuObject.AddComponent<ParentConstraint>();
+                ConstraintSource Wrist = new ConstraintSource();
+                Wrist.sourceTransform = WristSource.transform;
+                Wrist.weight = 1;
+                parentConstraint.AddSource(Wrist);
+                parentConstraint.weight = 1;
+                //parentConstraint.SetRotationOffset(0, new Vector3());
+                parentConstraint.constraintActive = true;
+            }
+            else
+            {
+                parentConstraint.constraintActive = true;
+            }
+
+        }*/
 
         public override void OnUpdate()
         { 
@@ -100,6 +144,21 @@ namespace ComfyQM_Standalone
                 VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.field_Private_Boolean_2 = false;
                 VRCUiCursorManager.field_Private_Static_VRCUiCursorManager_0.field_Private_Boolean_7 = false;
             }
+            /*if (uncomfyQM.Value == true)
+            {
+                ComfyToggle.Value = false;
+                UnComfy();
+                return;
+            }
+            else
+            {
+                var parentConstraint = QuickMenuObject.GetComponent<ParentConstraint>();
+                if (parentConstraint != null)
+                {
+                    parentConstraint.constraintActive = false;
+                }
+
+            }*/
 
         }
         
